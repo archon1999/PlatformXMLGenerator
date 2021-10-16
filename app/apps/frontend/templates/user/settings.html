@@ -1,0 +1,189 @@
+{% extends "base.html" %}
+{% load custom_tags %}  
+
+
+{% block page_level_styles %}
+<link rel="stylesheet" type="text/css" href="/static/plugins/dropify/dropify.min.css">
+<link href="/static/assets/css/users/account-setting.css" rel="stylesheet" type="text/css" />
+<link href="/static/plugins/editors/quill/quill.snow.css" rel="stylesheet" type="text/css">
+<link href="/static/plugins/flatpickr/flatpickr.css" rel="stylesheet" type="text/css">
+<link href="/static/plugins/flatpickr/custom-flatpickr.css" rel="stylesheet" type="text/css">
+<link href="/static/assets/css/users/user-profile.css" rel="stylesheet" type="text/css" />
+<link rel="stylesheet" type="text/css" href="/static/assets/css/elements/alert.css">
+{% endblock %}
+
+{% block title %}
+Настройки
+{% endblock %}
+
+{% block content %}
+<div class="col-12 layout-spacing">
+    {% if request.method == 'POST' %}
+        {% if form.errors %}
+        <div class="alert alert-icon-left alert-light-warning mb-4" role="alert">
+            <button type="button" class="close" data-dismiss="alert" aria-label="Close">{% include 'font-icons/close.svg' %}</button>
+            {% include 'font-icons/warning.svg' %}
+            <strong>Внимание!</strong> В некоторых полях обнаружены ошибки.
+        </div>
+        {% else %}
+        <div class="alert alert-icon-left alert-light-success mb-4" role="alert">
+            <button type="button" class="close" data-dismiss="alert" aria-label="Close">{% include 'font-icons/close.svg' %}</button>
+            {% include 'font-icons/info.svg' %}
+            <strong>Сохранено</strong>
+        </div>
+        {% endif %}
+    {% endif %}
+    <div class="row">
+        <div class="col-12 layout-spacing">
+            <form method="POST" enctype="multipart/form-data" id="settings">
+                {% csrf_token %}
+                <div class="layout-spacing">
+                    <div class="section general-info">
+                        <div class="info">
+                            <h6 class="">Основная информация</h6>
+                            <div class="row">
+                                <div class="col-lg-11 mx-auto">
+                                    <div class="row">
+                                        <div class="col-xl-10 col-lg-12 col-md-8 mt-md-0 mt-4">
+                                            <div class="row">
+                                                <div class="col-sm-6">
+                                                    <div class="form-group">
+                                                        <b class="text-danger">
+                                                            {{ form.first_name.errors.0 }}
+                                                        </b>    
+                                                        <label for="first_name">Имя</label>
+                                                        <input name="first_name" type="text" class="form-control mb-4" value="{{ user.first_name }}">
+
+                                                        <b class="text-danger">
+                                                            {{ form.last_name.errors.0 }}
+                                                        </b>
+                                                        <label for="last_name">Фамилия</label>
+                                                        <input name="last_name" type="text" class="form-control mb-4" value="{{ user.last_name }}">
+                                                    </div>
+                                                </div>
+                                                <div class="col-sm-6">
+                                                    <label class="dob-input">Дата рождения</label>
+                                                    <div class="form-group mb-0">
+                                                        <input id="date_of_birth" name="date_of_birth" class="form-control flatpickr flatpickr-input active" type="text" placeholder="Выберите дату..."
+                                                            {% if user.date_of_birth %} value="{{ user.date_of_birth|date:"Y-m-d" }}" {% endif %}>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>                        
+                    </div>
+                </div>    
+
+                <div class="layout-spacing">
+                    <div class="section change-username">
+                        <div class="info">
+                            <h5 class="">Изменить логин</h5>
+                            <div class="col-md-11 mx-auto">
+                                <div class="form-group">
+                                    <b class="text-warning">
+                                        {{ form.new_username.help_text }}
+                                    </b>
+                                    <b class="text-danger">
+                                        {{ form.new_username.errors.0 }}
+                                    </b>
+                                    <div class="form-group mb-4">
+                                        <input type="text" class="form-control" name="new_username" placeholder="Новый логин">
+                                    </div>
+                                    <b class="text-danger">
+                                        {{ form.password.errors.0 }}
+                                    </b>
+                                    <div class="form-group mb-4">
+                                        <input type="password" class="form-control" name="password" placeholder="Текущий пароль">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>    
+
+                <div class="layout-spacing">
+                    <div class="section change-password">
+                        <div class="info">
+                            <h5 class="">Изменить пароль</h5>
+                            <div class="col-md-11 mx-auto">
+                                <div class="form-group">
+                                    <b class="text-danger">
+                                        {{ form.old_password.errors.0 }}
+                                    </b>
+                                    <div class="form-group mb-4">
+                                        <input type="password" class="form-control" name="old_password" placeholder="Текущий пароль">
+                                    </div>
+                                    <div class="form-group mb-4">
+                                        <input type="password" class="form-control" name="new_password" placeholder="Новый пароль">
+                                    </div>
+                                    <b class="text-danger">
+                                        {{ form.confirm_password.errors.0 }}
+                                    </b>
+                                    <div class="form-group">
+                                        <input type="password" class="form-control" name="confirm_password" placeholder="Потдверждение пароля">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <input type="hidden" name="username" value="{{ user.username }}">
+
+                <div class="account-settings-footer">
+                    <div class="as-footer-container">
+                        <button id="submit" type="submit" class="btn btn-primary">Сохранить изменения</button>
+                    </div>
+                </div>
+
+            </form>
+        </div>    
+    </div>
+</div>
+
+{% endblock %}
+
+{% block page_level_scripts %}
+<script src="/static/plugins/dropify/dropify.min.js"></script>
+<script src="/static/plugins/blockui/jquery.blockUI.min.js"></script>
+<script src="/static/assets/js/users/account-settings.js"></script>
+<script src="/static/plugins/flatpickr/flatpickr.js"></script>
+<script src="/static/plugins/noUiSlider/nouislider.min.js"></script>
+<script src="/static/plugins/editors/quill/quill.js"></script>
+<script>
+    var f1 = flatpickr(document.getElementById('date_of_birth'));
+
+    var quill = new Quill('#editor', {
+        modules: {
+            toolbar: [
+                ['bold', 'italic', 'underline', 'strike'],        
+                ['blockquote', 'code-block'],
+             
+                [{ 'list': 'ordered'}, { 'list': 'bullet' }],
+                [{ 'script': 'sub'}, { 'script': 'super' }],     
+                [{ 'indent': '-1'}, { 'indent': '+1' }],          
+                [{ 'direction': 'rtl' }],                        
+
+                [{ 'size': ['small', false, 'large', 'huge'] }],  
+                [{ 'header': [1, 2, 3, 4, 5, 6, false] }],
+
+                [{ 'color': [] }, { 'background': [] }],          
+                [{ 'font': [] }],
+                [{ 'align': [] }],
+
+                ['clean']
+            ]
+        },
+        theme: 'snow',
+    });
+
+    document.getElementById("editor").children[0].innerHTML= "{{ user.info.bio|safe }}"; 
+
+    $("#settings").on("submit", function(){
+        $("#bio").val(document.getElementById("editor").children[0].innerHTML);
+    })
+</script>
+{% endblock %}
