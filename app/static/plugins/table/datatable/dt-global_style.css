@@ -9,9 +9,9 @@
 	===============================
 */
 .widget-content-area {
-  border: 1px solid #e0e6ed;
-  box-shadow: 0 0 40px 0 rgba(94, 92, 154, 0.06);
-  padding: 0; }
+  -webkit-box-shadow: 0 4px 6px 0 rgba(85, 85, 85, 0.0901961), 0 1px 20px 0 rgba(0, 0, 0, 0.08), 0px 1px 11px 0px rgba(0, 0, 0, 0.06);
+  -moz-box-shadow: 0 4px 6px 0 rgba(85, 85, 85, 0.0901961), 0 1px 20px 0 rgba(0, 0, 0, 0.08), 0px 1px 11px 0px rgba(0, 0, 0, 0.06);
+  box-shadow: 0 4px 6px 0 rgba(85, 85, 85, 0.0901961), 0 1px 20px 0 rgba(0, 0, 0, 0.08), 0px 1px 11px 0px rgba(0, 0, 0, 0.06); }
 
 .no-content:before, .no-content:after {
   display: none !important; }
@@ -84,7 +84,7 @@ table.dataTable {
   text-transform: initial;
   font-weight: 600;
   border-top: none;
-  background: rgba(234, 241, 255, 0.74);
+  background: rgba(244, 248, 255, 0.74);
   border-right: none;
   border-left: none;
   padding-top: 0;
@@ -120,7 +120,7 @@ table.dataTable {
   padding: 10px 21px 10px 21px;
   color: #515365;
   letter-spacing: normal;
-  white-space: nowrap; }
+ }
 
 .table-striped tbody tr:nth-of-type(odd) {
   background-color: transparent !important; }

@@ -1,7 +1,7 @@
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
 
-from apps.backend.models import User, Platform, Category
+from apps.backend.models import User, Platform, Category, Project
 
 admin.site.register(User, UserAdmin)
 
@@ -15,3 +15,8 @@ class PlatformAdmin(admin.ModelAdmin):
 class CategoryAdmin(admin.ModelAdmin):
     list_display = ['platform', 'name', 'parent', 'xml_feed',
                     'created', 'updated']
+
+
+@admin.register(Project)
+class ProjectAdmin(admin.ModelAdmin):
+    list_display = ['platform', 'name', 'created', 'updated']

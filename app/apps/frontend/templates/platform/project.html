@@ -1,0 +1,614 @@
+{% extends 'base.html' %}
+
+{% block page_level_styles %}
+<link href="/static/assets/css/elements/miscellaneous.css" rel="stylesheet" type="text/css" />
+<link href="/static/assets/css/components/custom-modal.css" rel="stylesheet" type="text/css" />
+<link href="/static/plugins/drag-and-drop/dragula/dragula.css" rel="stylesheet" type="text/css" />
+<link href="/static/plugins/drag-and-drop/dragula/example.css" rel="stylesheet" type="text/css" />
+<link href="/static/assets/css/components/custom-list-group.css" rel="stylesheet" type="text/css">
+<link rel="stylesheet" type="text/css" href="/static/assets/css/forms/theme-checkbox-radio.css">
+{% endblock %}
+
+{% block title %}
+{{ platform.name }}
+{% endblock %}
+
+{% block content %}
+<div class="col-lg-4 col-md-5 col-sm-6">
+  <div class="layout-spacing">
+    <div class="widget widget-table-two widget-content-area underline-content">
+      <div class="widget-header">
+        <h5>
+          <div class="row justify-content-between">
+            <div class="col-10">
+              <div class="text-center">
+                Проекты
+              </div>
+            </div>
+            <div class="col-2">
+              <a href="#" data-toggle="modal" data-target="#project-new-modal">
+                {% include 'font-icons/add.svg' %}
+              </a>
+            </div>
+          </div>
+        </h5>
+        <hr class="mt-2 mb-2">
+      </div>
+      <div class="widget-content">
+        <div class='parent ex-1'>
+          <div id='projects' class='dragula'>
+            {% for platform_project in projects %}
+            <div id="project-{{ platform_project.id }}"
+              class="project media d-md-flex d-block text-sm-left text-center">
+              <div class="media-body">
+                <div class="d-xl-flex d-block justify-content-between">
+                  <div class="">
+                    <a href="{% url 'project' platform.id platform_project.id %}"">
+                      <span class=" badge {% if platform_project != project %}outline-{% endif %}badge-primary">
+                      {{ platform_project.name }}
+                      </span>
+                    </a>
+                  </div>
+                  <div class="">
+                    <div class="dropdown d-inline-block">
+                      <a class="dropdown-toggle" href="#" role="button" id="pendingTask" data-toggle="dropdown"
+                        aria-haspopup="true" aria-expanded="true">
+                        {% include 'font-icons/dropdown.svg' %}
+                      </a>
+
+                      <div class="dropdown-menu right" aria-labelledby="pendingTask">
+                        <a class="dropdown-item" href="#" data-toggle="modal"
+                          data-target="#project-{{ platform_project.id }}-edit-modal">
+                          {% include 'font-icons/edit.svg' %}
+                          Редактировать
+                        </a>
+                        <a class="dropdown-item" href="{% url 'delete_project' platform.id platform_project.id %}">
+                          {% include 'font-icons/delete.svg' %}
+                          Удалить
+                        </a>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="modal fade" id="project-{{ platform_project.id }}-edit-modal" tabindex="-1" role="dialog"
+              aria-hidden="true">
+              <div class="modal-dialog modal-dialog-centered" role="document">
+                <div class="modal-content">
+                  <div class="modal-header">
+                    <h5 class="modal-title">
+                      Редактировать
+                    </h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                      {% include 'font-icons/close.svg' %}
+                    </button>
+                  </div>
+                  <form action="{% url 'edit_project' platform.id platform_project.id %}" method="POST">
+                    {% csrf_token %}
+                    <div class="modal-body">
+                      <div class="form-group">
+                        <label for="project_name">
+                          Новое название для <strong>{{ platform_project.name }}</strong>
+                        </label>
+                        <input type="text" class="form-control" name="project_name" value="{{ platform_project.name }}"
+                          required>
+                      </div>
+                    </div>
+                    <div class="modal-footer">
+                      <button class="btn" data-dismiss="modal">
+                        Отменить
+                      </button>
+                      <button type="submit" class="btn btn-primary">
+                        Сохранить
+                      </button>
+                    </div>
+                    <input type="hidden" name="project_id" id="project_id">
+                  </form>
+                </div>
+              </div>
+            </div>
+            {% endfor %}
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal fade" id="project-new-modal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
+  aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">
+          Новый проект
+        </h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          {% include 'font-icons/close.svg' %}
+        </button>
+      </div>
+      <form action="{% url 'new_project' platform.id %}" method="POST">
+        {% csrf_token %}
+        <div class="modal-body">
+          <div class="form-group">
+            <label for="project_name">
+              Название
+            </label>
+            <input type="text" class="form-control" name="project_name" required>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button class="btn" data-dismiss="modal">
+            Отменить
+          </button>
+          <button type="submit" class="btn btn-primary">
+            Сохранить
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+
+<div class="col-lg-8 col-md-7 col-sm-6">
+  <div class="layout-spacing">
+    <div class="widget widget-table-two widget-content-area underline-content">
+      <div class="widget-header">
+        <h5 class="text-center mt-2">
+          Проект, <u> {{ project.name }}</u>
+          <hr class="mb-2">
+        </h5>
+      </div>
+      <div class="widget-content">
+        <div class="row justify-content-end">
+          <button class="btn btn-outline-primary mr-2">
+            {% include 'font-icons/copy.svg' %}
+            Скопировать URL XML фида
+          </button>
+          <button class="btn btn-primary ml-2 mr-2" data-toggle="modal" data-target="#project-category-add-modal">
+            {% include 'font-icons/add.svg' %}
+            Добавить категорию
+          </button>
+          <div class="dropdown d-inline-block mt-1 ml-2 mr-2">
+            <a class="dropdown-toggle" href="#" role="button" id="pendingTask" data-toggle="dropdown"
+              aria-haspopup="true" aria-expanded="true">
+              {% include 'font-icons/dropdown.svg' %}
+            </a>
+
+            <div class="dropdown-menu left">
+              <a class="dropdown-item" href="#" onclick="project_categories_delete_submit()">
+                {% include 'font-icons/delete.svg' %}
+                Удалить
+              </a>
+            </div>
+          </div>
+        </div>
+
+        <form action="{% url 'project_delete_category' platform.id project.id %}" method="POST" id="project_categories_delete_form">
+
+          <div class="widget widget-content mt-4 mb-4">
+            <div class="table-responsive">
+              <table id="project_categories" class="table">
+                <thead>
+                  <tr>
+                    <th class="th-content text-info">
+                      <div class="n-chk">
+                        <label class="new-control new-checkbox checkbox-info">
+                          <input type="checkbox" class="new-control-input" id="checkbox-all">
+                          <span class="new-control-indicator"></span>&nbsp
+                        </label>
+                      </div>
+                    </th>
+                    <th class="th-content text-primary">Категория</th>
+                    <th class="th-content text-primary">Ссылка на таблицу</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {% for project_category in project.categories.all %}
+                  <tr>
+                    <td class="td-content">
+                      <div class="pl-1 n-chk">
+                        <label class="new-control new-checkbox checkbox-info">
+                          <input type="checkbox" class="new-control-input" name="checkbox-{{ project_category.id }}">
+                          <span class="new-control-indicator"></span>&nbsp
+                        </label>
+                      </div>
+                    </td>  
+                    <td class="td-content">
+                      <strong>{{ project_category.category.get_full_name }}</strong>
+                    </td>  
+                    <td class="td-content">
+                      <a href="" class="pl-2 text-primary">
+                        <strong>
+                          <u>
+                            Перейти в таблицу
+                          </u>
+                        </strong>
+                      </a>
+                    </td>  
+                  </tr>
+                  {% endfor %}
+                </tbody>
+              </table>
+            </div>
+            {% csrf_token %}
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+  <div class="modal fade" id="project-category-add-modal" tabindex="-1" role="dialog"
+    aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">
+            Добавить категорию
+          </h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            {% include 'font-icons/close.svg' %}
+          </button>
+        </div>
+        <form action="{% url 'project_new_category' platform.id project.id %}" method="POST">
+          {% csrf_token %}
+          <div class="modal-body">
+            <div class="form-group">
+              <select id="categories-level-0" style="display: none;"></select>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button class="btn" data-dismiss="modal">
+              Отменить
+            </button>
+            <button type="submit" class="btn btn-primary">
+              Сохранить
+            </button>
+          </div>
+          <input type="hidden" name="category_id" id="category_id">
+        </form>
+      </div>
+    </div>
+  </div>
+
+  {% endblock %}
+
+  {% block page_level_scripts %}
+  <script>
+    var categories = [{% for category in categories %}{
+      'id': {{ category.id }},
+      'name': '{{ category.name }}',
+        'description': '{{ category.description }}',
+          'parent_id': {% if category.parent %} {{ category.parent.id }} {% else %} 0{% endif %},
+      'parent_name': '{{ category.parent.name }}',
+        'level': {{ category.level }},
+    }, {% endfor %}];
+
+    categories.push({
+      'id': 0,
+      'name': '',
+      'description': 'Выберите категорию',
+      'parent_name': '',
+      'level': 0,
+    })
+
+    $("#categories-level-1").append($('<option>', {
+      value: 0,
+      text: '',
+    }));
+
+    var max_level = 1;
+    for (var index in categories) {
+      category = categories[index];
+      if (category.level == 1) {
+        $("#categories-level-1").append($('<option>', {
+          value: category.id,
+          text: category.name,
+        }));
+      }
+      if (category.level > max_level) {
+        max_level = category.level;
+      }
+    }
+  </script>
+
+  <script>
+    function get_category_by_id(id) {
+      for (var index in categories) {
+        category = categories[index];
+        if (category.id == id) {
+          return category;
+        }
+      }
+    }
+
+    function get_category_children(id) {
+      var children = [];
+      for (var index in categories) {
+        category = categories[index];
+        if (category.parent_id == id) {
+          children.push(category);
+        }
+      }
+      return children;
+    }
+
+    function restructure_select_tags(category_id) {
+      var category = get_category_by_id(category_id);
+      var children = get_category_children(category_id);
+      if (children.length == 0) {
+        return;
+      }
+
+      for (var level = category.level + 1; level <= max_level; level++) {
+        $(`#categories-level-${level}`).remove();
+        $(`#categories-level-${level}-label`).remove();
+      }
+
+      var select_tag = $(`#categories-level-${category.level}`);
+      var parent_tag = select_tag.parent();
+      parent_tag.append(`
+      <label class="text-primary pl-1" id="categories-level-${category.level + 1}-label">
+        <strong>${category.description}: </strong>
+      </label>
+      <select id="categories-level-${category.level + 1}" class="form-control mb-2"
+        style="height: 35px; padding: 0px; padding-left: 15px;">
+      </select>
+    `);
+
+      $(`#categories-level-${category.level + 1}`).append($('<option>', {
+        value: category.id,
+        text: '',
+      }));
+
+      for (var index in children) {
+        var child = children[index];
+        $(`#categories-level-${child.level}`).append($('<option>', {
+          value: child.id,
+          text: child.name,
+        }));
+
+        $(`#categories-level-${category.level + 1}`).on('change', function () {
+          var category_id = this.value;
+          restructure_select_tags(category_id);
+          $("#category_id").val(category_id);
+        })
+      }
+    };
+
+    restructure_select_tags(0);
+  </script>
+
+<script>
+  $("#checkbox-all").on('change', function() {
+    if ($("#checkbox-all").is(':checked')){
+      $('body input:checkbox').prop('checked', true);
+    } else {
+      $('body input:checkbox').prop('checked', false);
+    }
+  });
+
+  function project_categories_delete_submit(){
+    $("#project_categories_delete_form").submit();
+  }
+</script>
+
+  <script src="/static/plugins/drag-and-drop/dragula/dragula.min.js"></script>
+  <script>
+    (function e(t, n, r) { function s(o, u) { if (!n[o]) { if (!t[o]) { var a = typeof require == "function" && require; if (!u && a) return a(o, !0); if (i) return i(o, !0); var f = new Error("Cannot find module '" + o + "'"); throw f.code = "MODULE_NOT_FOUND", f } var l = n[o] = { exports: {} }; t[o][0].call(l.exports, function (e) { var n = t[o][1][e]; return s(n ? n : e) }, l, l.exports, e, t, n, r) } return n[o].exports } var i = typeof require == "function" && require; for (var o = 0; o < r.length; o++)s(r[o]); return s })({
+      1: [function (require, module, exports) {
+        'use strict';
+
+        var crossvent = require('crossvent');
+        // var sortable = $('sortable');
+        dragula([document.getElementById('projects')])
+          .on('drag', function (el) {
+            el.className += ' el-drag-ex-1';
+          }).on('drop', function (el) {
+            el.className = el.className.replace('el-drag-ex-1', '');
+            var elems = document.getElementsByClassName("project");
+            var id_list = [];
+            for (var index in elems) {
+              try {
+                id_list.push(Number(elems[index].getAttribute("id").substr(8)));
+              } catch {
+
+              }
+            }
+            id_list.pop();
+            $.post("/platform/{{ platform.id }}/projects/reorder/", {
+              'id_list': id_list,
+              'csrfmiddlewaretoken': '{{ csrf_token }}',
+            });
+
+          }).on('cancel', function (el) {
+            el.className = el.className.replace('el-drag-ex-1', '');
+          });
+
+
+      }, { "crossvent": 3 }], 2: [function (require, module, exports) {
+        (function (global) {
+
+          var NativeCustomEvent = global.CustomEvent;
+
+          function useNative() {
+            try {
+              var p = new NativeCustomEvent('cat', { detail: { foo: 'bar' } });
+              return 'cat' === p.type && 'bar' === p.detail.foo;
+            } catch (e) {
+            }
+            return false;
+          }
+
+          /**
+           * Cross-browser `CustomEvent` constructor.
+           *
+           * https://developer.mozilla.org/en-US/docs/Web/API/CustomEvent.CustomEvent
+           *
+           * @public
+           */
+
+          module.exports = useNative() ? NativeCustomEvent :
+
+            // IE >= 9
+            'function' === typeof document.createEvent ? function CustomEvent(type, params) {
+              var e = document.createEvent('CustomEvent');
+              if (params) {
+                e.initCustomEvent(type, params.bubbles, params.cancelable, params.detail);
+              } else {
+                e.initCustomEvent(type, false, false, void 0);
+              }
+              return e;
+            } :
+
+              // IE <= 8
+              function CustomEvent(type, params) {
+                var e = document.createEventObject();
+                e.type = type;
+                if (params) {
+                  e.bubbles = Boolean(params.bubbles);
+                  e.cancelable = Boolean(params.cancelable);
+                  e.detail = params.detail;
+                } else {
+                  e.bubbles = false;
+                  e.cancelable = false;
+                  e.detail = void 0;
+                }
+                return e;
+              }
+
+        }).call(this, typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
+
+      }, {}], 3: [function (require, module, exports) {
+        (function (global) {
+          'use strict';
+
+          var customEvent = require('custom-event');
+          var eventmap = require('./eventmap');
+          var doc = global.document;
+          var addEvent = addEventEasy;
+          var removeEvent = removeEventEasy;
+          var hardCache = [];
+
+          if (!global.addEventListener) {
+            addEvent = addEventHard;
+            removeEvent = removeEventHard;
+          }
+
+          module.exports = {
+            add: addEvent,
+            remove: removeEvent,
+            fabricate: fabricateEvent
+          };
+
+          function addEventEasy(el, type, fn, capturing) {
+            return el.addEventListener(type, fn, capturing);
+          }
+
+          function addEventHard(el, type, fn) {
+            return el.attachEvent('on' + type, wrap(el, type, fn));
+          }
+
+          function removeEventEasy(el, type, fn, capturing) {
+            return el.removeEventListener(type, fn, capturing);
+          }
+
+          function removeEventHard(el, type, fn) {
+            var listener = unwrap(el, type, fn);
+            if (listener) {
+              return el.detachEvent('on' + type, listener);
+            }
+          }
+
+          function fabricateEvent(el, type, model) {
+            var e = eventmap.indexOf(type) === -1 ? makeCustomEvent() : makeClassicEvent();
+            if (el.dispatchEvent) {
+              el.dispatchEvent(e);
+            } else {
+              el.fireEvent('on' + type, e);
+            }
+            function makeClassicEvent() {
+              var e;
+              if (doc.createEvent) {
+                e = doc.createEvent('Event');
+                e.initEvent(type, true, true);
+              } else if (doc.createEventObject) {
+                e = doc.createEventObject();
+              }
+              return e;
+            }
+            function makeCustomEvent() {
+              return new customEvent(type, { detail: model });
+            }
+          }
+
+          function wrapperFactory(el, type, fn) {
+            return function wrapper(originalEvent) {
+              var e = originalEvent || global.event;
+              e.target = e.target || e.srcElement;
+              e.preventDefault = e.preventDefault || function preventDefault() { e.returnValue = false; };
+              e.stopPropagation = e.stopPropagation || function stopPropagation() { e.cancelBubble = true; };
+              e.which = e.which || e.keyCode;
+              fn.call(el, e);
+            };
+          }
+
+          function wrap(el, type, fn) {
+            var wrapper = unwrap(el, type, fn) || wrapperFactory(el, type, fn);
+            hardCache.push({
+              wrapper: wrapper,
+              element: el,
+              type: type,
+              fn: fn
+            });
+            return wrapper;
+          }
+
+          function unwrap(el, type, fn) {
+            var i = find(el, type, fn);
+            if (i) {
+              var wrapper = hardCache[i].wrapper;
+              hardCache.splice(i, 1); // free up a tad of memory
+              return wrapper;
+            }
+          }
+
+          function find(el, type, fn) {
+            var i, item;
+            for (i = 0; i < hardCache.length; i++) {
+              item = hardCache[i];
+              if (item.element === el && item.type === type && item.fn === fn) {
+                return i;
+              }
+            }
+          }
+
+        }).call(this, typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
+
+      }, { "./eventmap": 4, "custom-event": 2 }], 4: [function (require, module, exports) {
+        (function (global) {
+          'use strict';
+
+          var eventmap = [];
+          var eventname = '';
+          var ron = /^on/;
+
+          for (eventname in global) {
+            if (ron.test(eventname)) {
+              eventmap.push(eventname.slice(2));
+            }
+          }
+
+          module.exports = eventmap;
+
+        }).call(this, typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
+
+      }, {}]
+    }, {}, [1])
+
+  </script>
+  {% endblock %}

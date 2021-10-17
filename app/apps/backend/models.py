@@ -35,6 +35,7 @@ class User(AbstractUser):
 
 
 class Platform(models.Model):
+    platforms = models.Manager()
     name = models.CharField(
         max_length=255,
         unique=True,
@@ -65,6 +66,10 @@ class Category(models.Model):
         unique=True,
         verbose_name='Название',
     )
+    description = models.CharField(
+        max_length=255,
+        verbose_name='Описание категории',
+    )
     parent = models.ForeignKey(
         to='self',
         on_delete=models.CASCADE,
@@ -84,5 +89,56 @@ class Category(models.Model):
         verbose_name = 'Категория'
         verbose_name_plural = 'Категории'
 
+    def get_full_name(self):
+        name_list = [self.name]
+        parent = self.parent
+        while parent:
+            name_list.append(parent.name)
+            parent = parent.parent
+
+        full_name = ' - '.join(reversed(name_list))
+        return full_name
+
     def __str__(self):
         return self.name
+
+
+class Project(models.Model):
+    uid = models.IntegerField()
+    projects = models.Manager()
+    platform = models.ForeignKey(
+        to=Platform,
+        on_delete=models.CASCADE,
+        related_name='projects',
+    )
+    user = models.ForeignKey(
+        to=User,
+        on_delete=models.CASCADE,
+        related_name='projects',
+    )
+    name = models.CharField(max_length=255, verbose_name='Название')
+    created = models.DateTimeField(auto_now_add=True,
+                                   verbose_name='Дата создания')
+    updated = models.DateTimeField(auto_now=True,
+                                   verbose_name='Дата изменения')
+
+    class Meta:
+        verbose_name = 'Проект'
+        verbose_name_plural = 'Проекты'
+
+    def __str__(self):
+        return self.name
+
+
+class ProjectCategory(models.Model):
+    project = models.ForeignKey(
+        to=Project,
+        on_delete=models.CASCADE,
+        related_name='categories',
+    )
+    category = models.ForeignKey(Category, on_delete=models.CASCADE)
+
+    created = models.DateTimeField(auto_now_add=True,
+                                   verbose_name='Дата создания')
+    updated = models.DateTimeField(auto_now=True,
+                                   verbose_name='Дата изменения')

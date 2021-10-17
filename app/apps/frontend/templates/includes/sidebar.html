@@ -3,7 +3,9 @@
     <nav id="sidebar">
         <ul class="navbar-nav theme-brand flex-row  text-center">
             <li class="nav-item theme-logo">
-                <a href="javascript:void(0);" class="sidebarCollapse pl-2 pr-2" data-placement="bottom"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-menu"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg></a>     
+                <a href="javascript:void(0);" class="sidebarCollapse pl-2 pr-2" data-placement="bottom">
+                    {% include 'font-icons/menu.svg' %}
+                </a>     
                 <a href="{% url 'home' %}">
                     <img src="/static/assets/img/90x90.jpg" class="navbar-logo" alt="logo">
                 </a>
@@ -34,12 +36,11 @@
                     </div>
                 </a>
                 <ul class="collapse submenu recent-submenu mini-recent-submenu list-unstyled" id="starter-kit" data-parent="#accordionExample">
+                    {% for platform in platforms %}
                     <li>
-                        <a href="javascript:void(0);">Авито</strong></a>
+                        <a href="{% url 'platform' platform.id %}"><strong>{{ platform.name }}</strong></a>
                     </li>
-                    <li>
-                        <a href="javascript:void(0);"><strong>Юла</strong></a>
-                    </li>  
+                    {% endfor %}  
                 </ul>
             </li>
 
