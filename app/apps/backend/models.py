@@ -69,6 +69,8 @@ class Category(models.Model):
     description = models.CharField(
         max_length=255,
         verbose_name='Описание категории',
+        null=True,
+        blank=True,
     )
     parent = models.ForeignKey(
         to='self',
@@ -78,8 +80,12 @@ class Category(models.Model):
         blank=True,
         verbose_name='Родитель',
     )
-    xml_feed = models.CharField(max_length=255,
-                                verbose_name='Значение для XML фида')
+    xml_feed = models.CharField(
+        max_length=255,
+        verbose_name='Значение для XML фида',
+        null=True,
+        blank=True,
+    )
     created = models.DateTimeField(auto_now_add=True,
                                    verbose_name='Дата создания')
     updated = models.DateTimeField(auto_now=True,
